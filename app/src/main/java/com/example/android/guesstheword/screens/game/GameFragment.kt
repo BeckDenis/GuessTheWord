@@ -14,9 +14,6 @@ import androidx.navigation.fragment.NavHostFragment
 import com.example.android.guesstheword.R
 import kotlinx.android.synthetic.main.fragment_game.*
 
-/**
- * A simple [Fragment] subclass.
- */
 class GameFragment : Fragment() {
 
     private lateinit var viewModel: GameViewModel
@@ -25,7 +22,6 @@ class GameFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_game, container, false)
     }
 
@@ -35,16 +31,19 @@ class GameFragment : Fragment() {
         viewModel = ViewModelProviders.of(this).get(GameViewModel::class.java)
 
         viewModel.word.observe(this, Observer { newWord ->
-            word_text.text = newWord
+            word_text.text = getString(R.string.quote_format, newWord)
         })
 
         viewModel.score.observe(this, Observer { newScore ->
-            score_text.text = newScore.toString()
+            score_text.text = getString(R.string.score_format, newScore)
         })
 
-        // Observer for the Game finished event
         viewModel.eventGameFinish.observe(this, Observer<Boolean> { hasFinished ->
             if (hasFinished) gameFinished()
+        })
+
+        viewModel.currentTimeString.observe(this, Observer { time ->
+            timer_text.text = time
         })
 
         correct_button.setOnClickListener { onCorrect() }
@@ -65,9 +64,8 @@ class GameFragment : Fragment() {
     }
 
     private fun gameFinished() {
-        Toast.makeText(activity, "Game has just finished", Toast.LENGTH_SHORT).show()
-            NavHostFragment.findNavController(this)
-                .navigate(GameFragmentDirections.actionGameToScore(viewModel.score.value ?: 0))
+        NavHostFragment.findNavController(this)
+            .navigate(GameFragmentDirections.actionGameToScore(viewModel.score.value ?: 0))
         viewModel.onGameFinishComplete()
     }
 }

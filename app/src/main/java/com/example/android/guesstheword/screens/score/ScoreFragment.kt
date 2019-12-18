@@ -13,9 +13,6 @@ import androidx.navigation.fragment.findNavController
 import com.example.android.guesstheword.R
 import kotlinx.android.synthetic.main.fragment_score.*
 
-/**
- * A simple [Fragment] subclass.
- */
 class ScoreFragment : Fragment() {
 
     private lateinit var viewModel: ScoreViewModel
@@ -25,7 +22,6 @@ class ScoreFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_score, container, false)
     }
 
@@ -42,7 +38,6 @@ class ScoreFragment : Fragment() {
 
         play_again_button.setOnClickListener { viewModel.onPlayAgain() }
 
-        // Navigates back to game when button is pressed
         viewModel.eventPlayAgain.observe(this, Observer { playAgain ->
             if (playAgain) {
                 findNavController().navigate(ScoreFragmentDirections.actionRestart())

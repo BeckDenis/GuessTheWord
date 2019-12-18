@@ -11,15 +11,11 @@ import androidx.navigation.fragment.findNavController
 import com.example.android.guesstheword.R
 import kotlinx.android.synthetic.main.fragment_title.*
 
-/**
- * A simple [Fragment] subclass.
- */
 class TitleFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_title, container, false)
     }
 
@@ -30,6 +26,4 @@ class TitleFragment : Fragment() {
             findNavController().navigate(TitleFragmentDirections.actionTitleToGame())
         }
     }
-
-
 }
