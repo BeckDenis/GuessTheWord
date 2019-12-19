@@ -43,4 +43,15 @@ dependencies {
 
     // Material Design
     implementation 'com.google.android.material:material:1.2.0-alpha02'
+
+    // Room
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+
+    // Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version"
+
+    // RecyclerView
+    implementation 'com.android.support:recyclerview-v7:29.0.2'
 }

@@ -13,6 +13,7 @@ import androidx.navigation.fragment.NavHostFragment
 
 import com.example.android.guesstheword.R
 import kotlinx.android.synthetic.main.fragment_game.*
+import kotlinx.android.synthetic.main.fragment_title.*
 
 class GameFragment : Fragment() {
 

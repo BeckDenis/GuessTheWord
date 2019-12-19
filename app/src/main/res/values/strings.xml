@@ -13,4 +13,6 @@
     <string name="word_is">The word is…</string>
     <string name="quote_format">\"%s\"</string>
     <string name="score_format">Current Score: %d</string>
+    <string name="enter_the_player_name">Enter the player name</string>
+    <string name="name_error">You did not enter a player name</string>
 </resources>
