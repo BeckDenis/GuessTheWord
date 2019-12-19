@@ -8,7 +8,7 @@ import com.example.android.guesstheword.R
 import com.example.android.guesstheword.database.Player
 import kotlinx.android.synthetic.main.player_item.view.*
 
-class PlayersAdapter(val clickListener: (Player) -> Unit ) :
+class PlayersAdapter(val clickListener: (Player) -> Unit , val deleteClickListener: (Player) -> Unit) :
     RecyclerView.Adapter<PlayersAdapter.ViewHolder>() {
 
     var data =  listOf<Player>()
@@ -29,6 +29,7 @@ class PlayersAdapter(val clickListener: (Player) -> Unit ) :
             name.text = player.name
         }
         holder.itemView.setOnClickListener { clickListener(player) }
+        holder.view.delete_button.setOnClickListener { deleteClickListener(player) }
     }
 
     override fun getItemCount() = data.size

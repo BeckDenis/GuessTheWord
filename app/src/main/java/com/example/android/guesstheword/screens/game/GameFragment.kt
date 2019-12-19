@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.NavHostFragment
 
 import com.example.android.guesstheword.R
+import com.example.android.guesstheword.database.PlayersDatabase
 import kotlinx.android.synthetic.main.fragment_game.*
 import kotlinx.android.synthetic.main.fragment_title.*
 
@@ -29,7 +30,16 @@ class GameFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProviders.of(this).get(GameViewModel::class.java)
+        val application = requireNotNull(this.activity).application
+
+        val dataSource = PlayersDatabase.getInstance(application).playersDatabaseDao
+
+        val viewModelFactory = GameViewModelFactory(dataSource)
+
+        viewModel =
+            ViewModelProviders.of(
+                this, viewModelFactory
+            ).get(GameViewModel::class.java)
 
         viewModel.word.observe(this, Observer { newWord ->
             word_text.text = getString(R.string.quote_format, newWord)
@@ -64,7 +74,12 @@ class GameFragment : Fragment() {
         gameFinished()
     }
 
+    private fun updatePlayerScore() {
+        viewModel.updatePlayerScore()
+    }
+
     private fun gameFinished() {
+        updatePlayerScore()
         NavHostFragment.findNavController(this)
             .navigate(GameFragmentDirections.actionGameToScore(viewModel.score.value ?: 0))
         viewModel.onGameFinishComplete()

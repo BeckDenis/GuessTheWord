@@ -36,11 +36,12 @@ class TitleFragment : Fragment() {
 
         viewModel =
             ViewModelProviders.of(
-                this, viewModelFactory).get(TitleViewModel::class.java)
+                this, viewModelFactory
+            ).get(TitleViewModel::class.java)
 
-        val adapter = PlayersAdapter() {
-            viewModel.deletePlayer(it)
-        }
+        val adapter = PlayersAdapter(deleteClickListener = { viewModel.deletePlayer(it) },
+            clickListener = { })
+
         players_list.adapter = adapter
 
         viewModel.players.observe(viewLifecycleOwner, Observer {
@@ -50,7 +51,9 @@ class TitleFragment : Fragment() {
         })
 
         play_game_button.setOnClickListener {
-            findNavController().navigate(TitleFragmentDirections.actionTitleToGame())
+            if ((viewModel.players.value?.size ?: 0) > 1) {
+                findNavController().navigate(TitleFragmentDirections.actionTitleToGame())
+            }
         }
 
         new_player_button.setOnClickListener { addNewPlayer() }

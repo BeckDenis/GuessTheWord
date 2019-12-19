@@ -2,13 +2,22 @@ package com.example.android.guesstheword.screens.game
 
 import android.os.CountDownTimer
 import android.text.format.DateUtils
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import com.example.android.guesstheword.database.Player
+import com.example.android.guesstheword.database.PlayersDatabaseDao
+import kotlinx.coroutines.*
 
-class GameViewModel : ViewModel() {
+class GameViewModel(
+    val database: PlayersDatabaseDao
+) : ViewModel() {
+    private var viewModelJob = Job()
+
+    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+
+    private var currentPlayer = MutableLiveData<Player?>()
 
     private val _score = MutableLiveData<Int>()
     val score: LiveData<Int>
@@ -25,6 +34,18 @@ class GameViewModel : ViewModel() {
     private val currentTime = MutableLiveData<Long>()
     val currentTimeString = Transformations.map(currentTime) { time ->
         DateUtils.formatElapsedTime(time)
+    }
+
+    private fun initializePlayer() {
+        uiScope.launch {
+            currentPlayer.value = getPlayerFromDatabase()
+        }
+    }
+
+    private suspend fun getPlayerFromDatabase(): Player? {
+        return withContext(Dispatchers.IO) {
+            database.getNewestPlayer()
+        }
     }
 
     private val timer: CountDownTimer
@@ -61,7 +82,7 @@ class GameViewModel : ViewModel() {
     init {
         _word.value = ""
         _score.value = 0
-        Log.i("GameViewModel", "GameViewModel created!")
+        initializePlayer()
         resetList()
         nextWord()
 
@@ -112,10 +133,24 @@ class GameViewModel : ViewModel() {
         _word.value = wordList.removeAt(0)
     }
 
+    private suspend fun update(night: Player) {
+        withContext(Dispatchers.IO) {
+            database.update(night)
+        }
+    }
+
+    fun updatePlayerScore() {
+        currentPlayer.value?.score = currentPlayer.value?.score!!.plus(score.value ?: 0)
+
+        uiScope.launch {
+            update(currentPlayer.value ?: return@launch)
+        }
+    }
 
     /** Method for the game completed event **/
 
     private fun onGameFinish() {
+
         _eventGameFinish.value = true
     }
 
