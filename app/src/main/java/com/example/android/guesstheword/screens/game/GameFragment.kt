@@ -6,15 +6,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.NavHostFragment
-
 import com.example.android.guesstheword.R
 import com.example.android.guesstheword.database.PlayersDatabase
 import kotlinx.android.synthetic.main.fragment_game.*
-import kotlinx.android.synthetic.main.fragment_title.*
 
 class GameFragment : Fragment() {
 
@@ -31,21 +27,17 @@ class GameFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val application = requireNotNull(this.activity).application
-
         val dataSource = PlayersDatabase.getInstance(application).playersDatabaseDao
+        val arguments = GameFragmentArgs.fromBundle(arguments!!)
+        val viewModelFactory = GameViewModelFactory(arguments.playerKey, dataSource)
 
-        val viewModelFactory = GameViewModelFactory(dataSource)
-
-        viewModel =
-            ViewModelProviders.of(
-                this, viewModelFactory
-            ).get(GameViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(GameViewModel::class.java)
 
         viewModel.word.observe(this, Observer { newWord ->
             word_text.text = getString(R.string.quote_format, newWord)
         })
 
-        viewModel.score.observe(this, Observer { newScore ->
+        viewModel.gameScore.observe(this, Observer { newScore ->
             score_text.text = getString(R.string.score_format, newScore)
         })
 
@@ -57,31 +49,20 @@ class GameFragment : Fragment() {
             timer_text.text = time
         })
 
+        viewModel.currentPlayer.observe(viewLifecycleOwner, Observer {
+            game_player_text.text = getString(R.string.game_player_text, it.name)
+        })
+
         correct_button.setOnClickListener { onCorrect() }
         skip_button.setOnClickListener { onSkip() }
         end_game_button.setOnClickListener { onEndGame() }
     }
 
-    private fun onSkip() {
-        viewModel.onSkip()
-    }
+    private fun onSkip() = viewModel.onSkip()
 
-    private fun onCorrect() {
-        viewModel.onCorrect()
-    }
+    private fun onCorrect() = viewModel.onCorrect()
 
-    private fun onEndGame() {
-        gameFinished()
-    }
+    private fun onEndGame() = viewModel.onGameFinish()
 
-    private fun updatePlayerScore() {
-        viewModel.updatePlayerScore()
-    }
-
-    private fun gameFinished() {
-        updatePlayerScore()
-        NavHostFragment.findNavController(this)
-            .navigate(GameFragmentDirections.actionGameToScore(viewModel.score.value ?: 0))
-        viewModel.onGameFinishComplete()
-    }
+    private fun gameFinished() = activity!!.onBackPressed()
 }

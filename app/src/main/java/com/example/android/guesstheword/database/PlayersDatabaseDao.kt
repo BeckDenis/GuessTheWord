@@ -18,7 +18,7 @@ interface PlayersDatabaseDao {
     fun clearAll()
 
     @Delete
-    fun clear(model: Player)
+    fun delete(model: Player)
 
     @Query("SELECT * FROM players_table ORDER BY playerId DESC LIMIT 1")
     fun getNewestPlayer(): Player?

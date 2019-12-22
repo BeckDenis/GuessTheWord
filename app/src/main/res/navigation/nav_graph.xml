@@ -8,35 +8,43 @@
     <fragment
         android:id="@+id/titleFragment"
         android:name="com.example.android.guesstheword.screens.title.TitleFragment"
-        android:label="fragment_title"
+        android:label="Guess The Word"
         tools:layout="@layout/fragment_title" >
         <action
-            android:id="@+id/action_title_to_game"
-            app:destination="@id/gameFragment" />
+            android:id="@+id/action_title_to_newGame"
+            app:destination="@id/newGameFragment" />
+        <action
+            android:id="@+id/action_title_to_stats"
+            app:destination="@id/statsFragment" />
     </fragment>
     <fragment
         android:id="@+id/gameFragment"
         android:name="com.example.android.guesstheword.screens.game.GameFragment"
-        android:label="fragment_game"
+        android:label="Good Luck"
         tools:layout="@layout/fragment_game" >
-        <action
-            android:id="@+id/action_game_to_score"
-            app:destination="@id/scoreFragment"
-            app:popUpTo="@+id/gameFragment"
-            app:popUpToInclusive="true" />
+        <argument
+            android:name="playerKey"
+            app:argType="long" />
     </fragment>
     <fragment
-        android:id="@+id/scoreFragment"
-        android:name="com.example.android.guesstheword.screens.score.ScoreFragment"
-        android:label="fragment_score"
-        tools:layout="@layout/fragment_score" >
-        <argument
-            android:name="score"
-            app:argType="integer" />
+        android:id="@+id/statsFragment"
+        android:name="com.example.android.guesstheword.screens.stats.StatsFragment"
+        android:label="Stats"
+        tools:layout="@layout/fragment_stats">
         <action
-            android:id="@+id/action_restart"
+            android:id="@+id/action_nextGame"
             app:destination="@id/gameFragment"
-            app:popUpTo="@+id/scoreFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/newGameFragment"
+        android:name="com.example.android.guesstheword.screens.newgame.NewGameFragment"
+        android:label="New Game"
+        tools:layout="@layout/fragment_new_game" >
+        <action
+            android:id="@+id/action_newGame_to_stats"
+            app:destination="@id/statsFragment"
+            app:popUpTo="@+id/newGameFragment"
             app:popUpToInclusive="true" />
     </fragment>
 </navigation>

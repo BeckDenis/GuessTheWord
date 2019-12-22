@@ -13,5 +13,8 @@ data class Player(
     var name: String = "",
 
     @ColumnInfo(name = "score")
-    var score: Int = 0
+    var score: Int = 0,
+
+    @ColumnInfo(name = "game_count")
+    var gameCount: Int = 0
 )

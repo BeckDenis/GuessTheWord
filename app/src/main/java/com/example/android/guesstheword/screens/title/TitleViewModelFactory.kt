@@ -1,6 +1,5 @@
 package com.example.android.guesstheword.screens.title
 
-import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.android.guesstheword.database.PlayersDatabaseDao

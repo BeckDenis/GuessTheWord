@@ -1,18 +1,19 @@
-package com.example.android.guesstheword.screens.game
+package com.example.android.guesstheword.screens.stats
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.android.guesstheword.database.PlayersDatabaseDao
 
-class GameViewModelFactory(
-    private val playerKey: Long,
+@Suppress("UNCHECKED_CAST")
+class StatsViewModelFactory (
     private val dataSource: PlayersDatabaseDao
 ) : ViewModelProvider.Factory {
-    @Suppress("unchecked_cast")
+
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(GameViewModel::class.java)) {
-            return GameViewModel(playerKey, dataSource) as T
+        if (modelClass.isAssignableFrom(StatsViewModel::class.java)) {
+            return StatsViewModel(dataSource) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
+
 }

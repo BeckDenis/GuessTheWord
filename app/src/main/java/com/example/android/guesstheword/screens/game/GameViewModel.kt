@@ -10,18 +10,20 @@ import com.example.android.guesstheword.database.Player
 import com.example.android.guesstheword.database.PlayersDatabaseDao
 import kotlinx.coroutines.*
 
-class GameViewModel(
-    val database: PlayersDatabaseDao
-) : ViewModel() {
+class GameViewModel(private val playerKey: Long, val database: PlayersDatabaseDao) : ViewModel() {
+
+    private lateinit var wordList: MutableList<String>
     private var viewModelJob = Job()
-
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+    private val timer: CountDownTimer
 
-    private var currentPlayer = MutableLiveData<Player?>()
+    private var _currentPlayer = MutableLiveData<Player>()
+    val currentPlayer: LiveData<Player>
+        get() = _currentPlayer
 
-    private val _score = MutableLiveData<Int>()
-    val score: LiveData<Int>
-        get() = _score
+    private val _gameScore = MutableLiveData<Int>()
+    val gameScore: LiveData<Int>
+        get() = _gameScore
 
     private val _word = MutableLiveData<String>()
     val word: LiveData<String>
@@ -36,56 +38,7 @@ class GameViewModel(
         DateUtils.formatElapsedTime(time)
     }
 
-    private fun initializePlayer() {
-        uiScope.launch {
-            currentPlayer.value = getPlayerFromDatabase()
-        }
-    }
-
-    private suspend fun getPlayerFromDatabase(): Player? {
-        return withContext(Dispatchers.IO) {
-            database.getNewestPlayer()
-        }
-    }
-
-    private val timer: CountDownTimer
-
-    private lateinit var wordList: MutableList<String>
-
-    private fun resetList() {
-        wordList = mutableListOf(
-            "queen",
-            "hospital",
-            "basketball",
-            "cat",
-            "change",
-            "snail",
-            "soup",
-            "calendar",
-            "sad",
-            "desk",
-            "guitar",
-            "home",
-            "railway",
-            "zebra",
-            "jelly",
-            "car",
-            "crow",
-            "trade",
-            "bag",
-            "roll",
-            "bubble"
-        )
-        wordList.shuffle()
-    }
-
     init {
-        _word.value = ""
-        _score.value = 0
-        initializePlayer()
-        resetList()
-        nextWord()
-
         timer = object : CountDownTimer(COUNTDOWN_TIME, ONE_SECOND) {
             override fun onTick(millisUntilFinished: Long) {
                 currentTime.value = millisUntilFinished / ONE_SECOND
@@ -97,6 +50,11 @@ class GameViewModel(
             }
         }
 
+        _word.value = ""
+        _gameScore.value = 0
+        initializePlayer()
+        resetList()
+        nextWord()
         timer.start()
     }
 
@@ -109,52 +67,62 @@ class GameViewModel(
         private const val COUNTDOWN_TIME = 60000L
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        timer.cancel()
+    private fun initializePlayer() {
+        uiScope.launch {
+            _currentPlayer.value = getPlayerFromDatabase()
+        }
     }
 
-
-    /** Methods for updating the UI **/
-
-    fun onSkip() {
-        _score.value = (_score.value)?.minus(1)
-        if (wordList.isEmpty()) resetList()
-        nextWord()
+    private suspend fun getPlayerFromDatabase(): Player? {
+        return withContext(Dispatchers.IO) {
+            database.get(playerKey)
+        }
     }
 
-    fun onCorrect() {
-        _score.value = (_score.value)?.plus(1)
-        if (wordList.isEmpty()) resetList()
-        nextWord()
+    private suspend fun update(player: Player) {
+        withContext(Dispatchers.IO) {
+            database.update(player)
+        }
+    }
+
+    private fun resetList() {
+        wordList = words.apply { shuffle() }
     }
 
     private fun nextWord() {
         _word.value = wordList.removeAt(0)
     }
 
-    private suspend fun update(night: Player) {
-        withContext(Dispatchers.IO) {
-            database.update(night)
-        }
+    fun onSkip() {
+        _gameScore.value = _gameScore.value?.minus(1)
+        if (wordList.isEmpty()) resetList()
+        nextWord()
     }
 
-    fun updatePlayerScore() {
-        currentPlayer.value?.score = currentPlayer.value?.score!!.plus(score.value ?: 0)
+    fun onCorrect() {
+        _gameScore.value = _gameScore.value?.plus(3)
+        if (wordList.isEmpty()) resetList()
+        nextWord()
+    }
+
+    fun onGameFinish() {
+        _eventGameFinish.value = true
+        updatePlayer()
+    }
+
+    private fun updatePlayer() {
+        _currentPlayer.value?.run {
+            score = _currentPlayer.value?.score!!.plus(gameScore.value ?: 0)
+            gameCount = _currentPlayer.value?.gameCount!!.plus(1)
+        }
 
         uiScope.launch {
-            update(currentPlayer.value ?: return@launch)
+            update(_currentPlayer.value ?: return@launch)
         }
     }
 
-    /** Method for the game completed event **/
-
-    private fun onGameFinish() {
-
-        _eventGameFinish.value = true
-    }
-
-    fun onGameFinishComplete() {
-        _eventGameFinish.value = false
+    override fun onCleared() {
+        super.onCleared()
+        timer.cancel()
     }
 }

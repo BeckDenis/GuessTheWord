@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:background="@drawable/circle_bg"
+    android:background="@drawable/new_game_item_bg"
     android:layout_margin="6dp"
     android:layout_height="@dimen/item_height">
 
@@ -16,9 +16,9 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="Андрей"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:gravity="center_vertical"
-        android:textColor="@color/colorAccent"
+        android:maxLines="1"
         app:layout_constraintEnd_toStartOf="@id/delete_button"
         android:textStyle="bold"
         android:paddingStart="20dp"

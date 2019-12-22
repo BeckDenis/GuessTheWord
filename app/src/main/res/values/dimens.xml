@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="item_height">30dp</dimen>
+    <dimen name="item_height">50dp</dimen>
+    <dimen name="vertical_guideline">16dp</dimen>
+    <dimen name="bottom_guideline">96dp</dimen>
 </resources>
